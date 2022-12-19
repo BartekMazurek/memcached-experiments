@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+
+    memcached:
+        build:
+            context: .
+            dockerfile: docker/memcached/Dockerfile
+        container_name: memcached
+        networks:
+            - test
+
+    nginx:
+        build:
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+        container_name: nginx
+        ports:
+            - 8080:80
+        volumes:
+            - '.:/var/www/html/php'
+            - './docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro'
+        networks:
+            - test
+
+    php:
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        container_name: php
+        volumes:
+            - '.:/var/www/html/php'
+        networks:
+            - test
+
+    python:
+        container_name: python3
+        build:
+            context: .
+            dockerfile: ./docker/python/Dockerfile
+        stdin_open: true
+        tty: true
+        volumes:
+            - .:/home/python
+        networks:
+            - test
+
+networks:
+    test:
+        driver: bridge
